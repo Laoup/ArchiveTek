@@ -1,0 +1,27 @@
+The purpose of this directory is to perform unit test
+Some main that tests every possibility (first a good case, and then wrong cases)
+
+HOW-TO (My way of thinking of it, can be improve)
+
+DEF PATTERN:
+
+TEST_{NAMEOFTEST}	to name the executable of the test
+
+SRCS_{NAMEOFTEST}	to put the minimal srcs of what will be tested
+			Have it's own main
+
+OBJS_{NAMEOFTEST}	basic
+
+RULES PATTERN:
+
+--really basic
+$(TEST_{NAMEOFTEST}): $(OBJS_{NAMEOFTEST})
+		      $(CXX) -o (TEST_{NAMEOFTEST}) $(OBJS_{NAMEOFTEST})
+--append it
+clean:
+	$(RM) $(OBJS_{NAMEOFTEST})
+
+--still append it
+fclean:
+	$(RM) $(TEST_{NAMEOFTEST})
+

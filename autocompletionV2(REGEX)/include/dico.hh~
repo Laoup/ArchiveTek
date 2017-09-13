@@ -1,0 +1,23 @@
+//
+// dico.hh for autocompletion in /home/meuric_a/Synthese_TEK2/autocompletion/include
+// 
+// Made by Alban Meurice
+// Login   <meuric_a@epitech.net>
+// 
+// Started on  Thu Jun 30 11:29:41 2016 Alban Meurice
+// Last update Thu Jun 30 11:31:36 2016 Alban Meurice
+//
+
+#ifndef DICO_HH_
+# define DICO_HH_
+
+#include "my.hh"
+
+class	Dico
+{
+public:
+  Dico(char *);
+  ~Dico();
+};
+
+#endif /* DICO_HH_ */

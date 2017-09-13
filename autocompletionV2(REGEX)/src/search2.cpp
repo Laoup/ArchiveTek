@@ -1,0 +1,443 @@
+//
+// search2.cpp for autocompletion in /home/meuric_a/Synthese_TEK2/autocompletionV2(REGEX)/src
+// 
+// Made by Alban Meurice
+// Login   <meuric_a@epitech.net>
+// 
+// Started on  Sat Jul  2 18:56:51 2016 Alban Meurice
+// Last update Wed Jul  6 19:57:25 2016 Alban Meurice
+//
+
+#include "../include/addrline.hh"
+#include "../include/my.hh"
+
+#include <iostream>
+
+void    my_check()
+{
+  int   i;
+
+  i = 0;
+  while (i != 1)
+    i += 1;
+}
+
+std::pair<std::string, int>    			convertList(std::list<std::string> &list)
+{
+  std::list<std::string>::iterator		it;
+  std::pair<std::string, int>  			name;
+
+  if (list.size() == 1)
+    {
+      name.first = list.front();
+      name.second = 0;
+    }
+  else
+    {
+      it = list.begin();
+      name.first = (*it);
+      name.second = 0;
+      it++;
+      while (it != list.end())
+	{
+	  name.first += " ";
+	  name.first += (*it);
+	  it++;
+	}
+    }
+  return (name);
+}
+
+std::list<std::pair<std::string, int> >				suprDouble(std::list<std::pair<std::string, int> > listCity)
+{
+  std::list<std::pair<std::string, int> >      	newList;
+  std::list<std::pair<std::string, int> >::iterator		it;
+  std::pair<std::string, int>			elem;
+  int						l;
+
+  while (listCity.empty() == false)
+    {
+      l = 0;
+      elem.first = listCity.front().first;
+      elem.second = listCity.front().second;
+      listCity.pop_front();
+      it = listCity.begin();
+      while (it != listCity.end())
+	{
+	  if (elem.first.compare((*it).first) == 0)
+	    {
+	      l = 1;
+	      it = listCity.end();
+	    }
+	  else
+	    it++;
+	}
+      if (l == 0)
+	newList.push_back(elem);
+    }
+  return (newList);
+}
+
+std::list<std::pair<std::string, int> >				suprDoubleMin(std::list<std::pair<std::string, int> > listCity)
+{
+  std::list<std::pair<std::string, int> >      	newList;
+  std::list<std::pair<std::string, int> >::iterator		it;
+  std::pair<std::string, int>			elem;
+  int						l;
+
+  while (listCity.empty() == false)
+    {
+      l = 0;
+      elem.first = listCity.front().first;
+      elem.second = listCity.front().second;
+      listCity.pop_front();
+      it = listCity.begin();
+      while (it != listCity.end())
+	{
+	  if (elem.first.compare((*it).first) == 0)
+	    {
+	      if (elem.second > (*it).second)
+		it = listCity.erase(it);
+	      else
+		{
+		  l = 1;
+		  it = listCity.end();
+		}
+	    }
+	  else
+	    it++;
+	}
+      if (l == 0)
+	newList.push_back(elem);
+    }
+  return (newList);
+}
+
+void   						countOccur(std::list<std::pair<std::string, int> > &list)
+{
+  std::list<std::pair<std::string, int> >::iterator	it;
+  std::list<std::pair<std::string, int> >::iterator	it2;
+
+  it = list.begin();
+  while (it != list.end())
+    {
+      it2 = list.begin();
+      while (it2 != list.end())
+	{
+	  /* modif */
+	  if ((*it).first.find((*it2).first) == 0)
+	    (*it).second += 1;
+	  /* */
+	  it2++;
+	}
+      it++;
+    }
+}
+
+bool						sameName(std::pair<std::string, int> one, std::pair<std::string, int> two)
+{
+  if (one.first.compare(two.first) == 0)
+    return (true);
+  return (false);
+}
+
+int						searchCity(std::list<AddrLine *> &listAddrTmp, AddrLine &cmd, std::string line)
+{
+  std::list<AddrLine *>::iterator		it;
+  std::list<std::pair<std::string, int> >	select;
+  std::list<std::pair<std::string, int> >::iterator	test;
+  std::list<std::string>			cityName;
+  std::string					strLower;
+  std::list<std::string>::iterator		it2;
+  std::pair<std::string, int>			city;
+
+  line = cmd.getLine() + line;
+  it = listAddrTmp.begin();
+  while (it != listAddrTmp.end())
+    {
+      cityName = cutName((*it)->getCity());
+      it2 = cityName.begin();
+      while (it2 != cityName.end())
+	{
+	  strLower = loweration((*it2));
+	  if (strLower.find(loweration(line)) == 0)
+	    {
+	      /*city = convertList(cityName);
+		select.push_back(city);*/
+	      /* modif */
+	      city.first = (*it2);
+	      city.second = 0;
+	      select.push_back(city);
+	      /* */
+	    }
+	  it2++;
+	} 
+      it++;
+    }
+  countOccur(select);
+  select = suprDouble(select);
+  if (select.size() == 1)
+    {
+      cmd.addCity(select.front().first);
+      cmd.searchInfo(listAddrTmp);
+    }
+  else
+    {
+      /*test = select.begin();
+      while (test != select.end())
+	{
+	  std::cout << "Name = " << (*test).first << " nb = " << (*test).second << std::endl;
+	  test++;
+	  }
+	  std::cout << "B" << std::endl;*/
+      cityChoice(select, cmd);
+    }
+  return (0);
+}
+
+std::list<std::string>				cutName(std::string name)
+{
+  std::list<std::string>			cityName;
+  std::string					part;
+  size_t					pos;
+
+  pos = 0;
+  while (name[pos] != '\0')
+    {
+      part = "";
+      while (name[pos] != '\0' && name[pos] != ' ')
+	{
+	  part += name[pos];
+	  pos += 1;
+	}
+      if (name[pos] == ' ')
+	pos += 1;
+      cityName.push_back(part);
+    }
+  return (cityName);
+}
+
+bool						nbElemTri(std::pair<std::string, int> one, std::pair<std::string, int> two)
+{
+  return (one.second > two.second);
+}
+
+int						searchMaxPair(std::list<std::pair<std::string, int> > list)
+{
+  std::list<std::pair<std::string, int> >::iterator	it;
+  int						max;
+
+  max = 0;
+  it = list.begin();
+  while (it != list.end())
+    {
+      if (it->second > max)
+	max = it->second;
+      it++;
+    }
+  return (max);
+}
+
+bool						compare_nocase_string(std::string &first, std::string &second)
+{
+  unsigned int					i;
+
+  i = 0;
+  while (i < first.length() && i < second.length())
+    {
+      if (first[i] < second[i])
+	return (true);
+      else if (first[i] > second[i])
+	return (false);
+      i++;
+    }
+  return (first.length() < second.length());
+}
+
+void						cityChoice(std::list<std::pair<std::string, int> > list, AddrLine &cmd)
+{
+  std::list<std::pair<std::string, int> >     	choice;
+  std::list<std::pair<std::string, int> >::iterator	it;
+  std::list<std::string>			select;
+  std::pair<std::string, int>			elem;
+  unsigned int					i;
+  char						c;
+  int						l;
+
+  i = l = 0;
+  while (l == 0)
+    {
+      it = list.begin();
+      c = list.front().first.c_str()[i];
+      while (it != list.end())
+	{
+	  if (c != (*it).first.c_str()[i])
+	    l = 1;
+	  it++;
+	}
+      if (l == 0)
+	i = i + 1;
+    }
+  it = list.begin();
+  while (it != list.end())
+    {
+      elem.first = (*it).first.substr(0, i + 1);
+      elem.second = (*it).second;
+      choice.push_back(elem);
+      it++;
+    }
+  cmd.changeLine(list.begin()->first.substr(0, i));
+  choice = suprDoubleMin(choice);
+  choice.sort(nbElemTri);
+  /* modif */
+  it = choice.begin();
+  while (it != choice.end())
+    {
+      l = 0;
+      while ((unsigned int)l != it->first.size())
+	{
+	  if (it->first[l] >= 'A' && it->first[l] <= 'Z')
+	    it->first[l] += 32;
+	  l += 1;
+	}
+      it++;
+    }
+  i = 0;
+  while (i != 5 && choice.empty() == false)
+    {
+      l = searchMaxPair(choice);
+      it = choice.begin();
+      while (it != choice.end())
+	{
+	  if (it->second == l)
+	    {
+	      select.push_back(it->first);
+	      it = choice.erase(it);
+	    }
+	  else
+	    it++;
+	}
+      if (select.size() == 1)
+	{
+	  std::cout << "{" << select.front() << "} ";
+	  select.pop_front();
+	  i += 1;
+	}
+      else
+	{
+	  select.sort(compare_nocase_string);
+	  while (i != 5 && select.empty() == false)
+	    {
+	      std::cout << "{" << select.front() << "} ";
+	      select.pop_front();
+	      i += 1;
+	    }
+	}
+    }
+  std::cout << std::endl;
+  /* */
+  /*  it = choice.begin();
+  while (it != choice.end())
+    {
+      std::cout << "{" << (*it).first << "} ";
+      it++;
+    }
+    std::cout << std::endl;*/
+}
+
+void						cityChoice2(std::list<std::pair<std::string, int> > list, AddrLine &cmd)
+{
+  std::list<std::pair<std::string, int> >     	choice;
+  std::list<std::pair<std::string, int> >::iterator	it;
+  std::list<std::string>			select;
+  std::pair<std::string, int>			elem;
+  unsigned int					i;
+  char						c;
+  int						l;
+
+  /*  it = list.begin();
+  while (it != list.end())
+    {
+      std::cout << "Name is: " << (*it).first << " nb is: " << (*it).second << std::endl;
+      it++;
+      }*/
+  i = l = 0;
+  while (l == 0)
+    {
+      it = list.begin();
+      c = loweration(list.front().first).c_str()[i];
+      while (it != list.end())
+	{
+	  if (c != loweration((*it).first).c_str()[i])
+	    l = 1;
+	  it++;
+	}
+      if (l == 0)
+	i = i + 1;
+    }
+  it = list.begin();
+  while (it != list.end())
+    {
+      elem.first = (*it).first.substr(0, i + 1);
+      elem.second = (*it).second;
+      choice.push_back(elem);
+      it++;
+    }
+  cmd.changeLine(list.begin()->first.substr(0, i));
+  choice = suprDoubleMin(choice);
+  choice.sort(nbElemTri);
+  /* modif */
+  it = choice.begin();
+  while (it != choice.end())
+    {
+      l = 0;
+      while ((unsigned int)l != it->first.size())
+	{
+	  if (it->first[l] >= 'A' && it->first[l] <= 'Z')
+	    it->first[l] += 32;
+	  l += 1;
+	}
+      it++;
+    }
+  i = 0;
+  while (i != 5 && choice.empty() == false)
+    {
+      l = searchMaxPair(choice);
+      it = choice.begin();
+      while (it != choice.end())
+	{
+	  if (it->second == l)
+	    {
+	      select.push_back(it->first);
+	      it = choice.erase(it);
+	    }
+	  else
+	    it++;
+	}
+      if (select.size() == 1)
+	{
+	  std::cout << "{" << upperage(cmd.getCity()) << ", " << select.front() << "} ";
+	  select.pop_front();
+	  i += 1;
+	}
+      else
+	{
+	  select.sort(compare_nocase_string);
+	  while (i != 5 && select.empty() == false)
+	    {
+	      std::cout << "{" << upperage(cmd.getCity()) << ", " << select.front() << "} ";
+	      select.pop_front();
+	      i += 1;
+	    }
+	}
+    }
+  std::cout << std::endl;
+  /* */
+  /*  it = choice.begin();
+  while (it != choice.end())
+    {
+      std::cout << "{" << (*it).first << "} ";
+      it++;
+    }
+    std::cout << std::endl;*/
+}

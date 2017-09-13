@@ -1,0 +1,30 @@
+Here we can put our header files within folders
+like
+
+parser/
+------/parser.hpp
+------/tree.hpp
+------/node.hpp
+
+prompt/
+------/prompt.hpp
+------/command.hpp
+
+and then we can do
+#include "parser/parser.hpp"
+
+folders allow us to know about what we are talking and resquesting, 
+	so that we keep a natural record of all the stuff organized
+
+to avoid same #infdef || #define between 2 similar header
+we recommand to put the capitalize name of the folder before the name
+thus we have for exemple :
+
+in "prompt/command.hpp"
+[
+#ifndef PROMPT_COMMAND_HPP_
+# define PROMPT_COMMAND_HPP_
+...
+#endif //PROMPT_COMMAND_HPP_
+]
+

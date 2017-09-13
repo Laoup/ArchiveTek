@@ -1,0 +1,28 @@
+/*
+** main.c for main FTP in /home/meuric_a/Projet_T2_Test/FTP/include
+** 
+** Made by Alban Meurice
+** Login   <meuric_a@epitech.net>
+** 
+** Started on  Tue May 10 14:20:10 2016 Alban Meurice
+** Last update Fri May 13 09:44:47 2016 Alban Meurice
+*/
+
+#include "../inc/ftp.h"
+#include <stdlib.h>
+#include <unistd.h>
+
+int	main(int argc, char **argv)
+{
+  int	port;
+
+  if (argc != 3)
+    return (-1);
+  if ((port = atoi(argv[1])) == 0)
+    return (-1);
+  if (chdir(argv[2]) == -1)
+    return (-1);
+  if (server(port) == -1)
+    return (-1);
+  return (0);
+}

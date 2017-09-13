@@ -1,0 +1,65 @@
+##
+## Makefile for me in /home/meuric_a/Makefile
+## 
+## Made by alban meurice
+## Login   <meuric_aepitech.net>
+## 
+## Started on  Tue Jan  4 10:29:21 2016 Alban Meurice
+## Last update Tue Jul  5 19:46:03 2016 Alban Meurice
+##
+
+RM		= rm -f
+
+CXX		= g++
+
+NAME		= autoCompletion
+
+SRCDIR		= src
+INCDIR		= include
+
+CXXFLAGS	+= -Wall -Wextra -Werror -g3
+CXXFLAGS	+= -I./ -I./$(INCDIR)/
+CXXFLAGS	+= -std=c++11
+
+SRCS		= $(SRCDIR)/main.cpp \
+		  $(SRCDIR)/addrLine.cpp \
+		  $(SRCDIR)/format.cpp \
+		  $(SRCDIR)/regex.cpp \
+		  $(SRCDIR)/search2.cpp \
+		  $(SRCDIR)/search.cpp \
+		  $(SRCDIR)/search3.cpp
+##		  $(SRCDIR)/
+
+OBJS		= $(SRCS:.cpp=.o)
+
+##<VISUAL CMD>
+
+ECHO		=	echo -e
+
+YELLOW		=	"\033[0;33m"
+GREEN		=	"\033[0;32m"
+RED		=	"\033[0;31m"
+RESET		=	"\033[0;0m"
+
+##</VISUAL CMD>
+
+all: $(NAME)
+
+$(NAME): $(OBJS)
+	$(CXX) -o $(NAME) $(OBJS)
+	@$(ECHO) $(GREEN)">Project \""$(NAME)"\" compiled" $(RESET)
+
+clean:
+	$(RM) $(OBJS)
+	@$(ECHO) $(YELLOW) "Directories  clean" $(RESET)
+
+fclean: clean
+	$(RM) $(NAME)
+	@$(ECHO) $(RED) "Directories full clean" $(RESET)
+
+re: fclean all
+
+test: all
+	./$(NAME)
+
+.PHONY: all clean fclean re test

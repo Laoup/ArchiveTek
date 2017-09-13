@@ -1,0 +1,105 @@
+/*
+** ftp.h for fpt include in /home/meuric_a/Projet_T2_Test/FTP/inc
+** 
+** Made by Alban Meurice
+** Login   <meuric_a@epitech.net>
+** 
+** Started on  Tue May 10 14:30:38 2016 Alban Meurice
+** Last update Fri May 13 19:57:24 2016 Alban Meurice
+*/
+
+#ifndef FTP_H_
+# define FTP_H_
+
+#include <netinet/in.h>
+
+#define NB_CMD	(13)
+
+typedef	struct		s_info_serveur
+{
+  char			*name_usr;
+  char			*passwd_usr;
+}			t_infoserv;
+
+/*typedef	struct		s_info_client
+{
+  struct sockaddr_in	si_SockClient;
+  socklen_t		size_SockClient;
+  }			t_client;*/
+
+typedef	struct		s_info_data_socket
+{
+  struct sockaddr_in	si_SockData;
+  int			P1;
+  int			P2;
+  char			*ip;
+  int			fd_SocketData;
+}			t_data;
+
+typedef	struct		s_status_serveur
+{
+  int			log;
+  int			auth;
+  int			open_pass;
+  t_infoserv		info;
+  t_data		data;
+  struct sockaddr_in	si_SockClient;
+}			t_statserv;
+
+typedef	struct		s_cmd_structure
+{
+  int			key_cmd;
+  char			*arg;
+}			t_cmd;
+
+static const	char	*tab_cmd[NB_CMD] = {
+  "USER",
+  "PASS",
+  "CWD",
+  "CDUP",
+  "QUIT",
+  "DELE",
+  "PWD",
+  "NOOP",
+  "HELP",
+  "PASV",
+  "RETR",
+  "STOR",
+  "LIST",
+};
+
+int	server(int);
+int	init_SockServ(int *, struct sockaddr_in *);
+void	init_status(t_statserv *);
+int	loop_Serv(int, int);
+
+int	creating_data_socket(t_statserv *);
+char	*convert_ip(char *);
+char	*convert_port(int, int);
+char	*convert_nbr(int);
+
+t_cmd	*read_cmd(char *);
+int	key_cmd_ok(char *);
+
+int	call_function(t_cmd *, int, t_statserv *);
+int	user_verif(t_cmd *, int, t_statserv *);
+int	pass_verif(t_cmd *, int, t_statserv *);
+int	swap_directory(t_cmd *, int, t_statserv *);
+int	parent_directory(t_cmd *, int, t_statserv *);
+int	quit(t_cmd *, int, t_statserv *);
+int	delete_file(t_cmd *, int, t_statserv *);
+int	print_directory(t_cmd *, int, t_statserv *);
+int	do_nothing(t_cmd *, int);
+int	help_function(t_cmd *, int);
+int	passive_mode(t_cmd *, int, t_statserv *);
+int	download_file(t_cmd *, int, t_statserv *);
+int	upload_file(t_cmd *, int, t_statserv *);
+int	list_file(t_cmd *, int, t_statserv *);
+
+int	size_file(char *);
+char	*read_file(int, char *);
+char	*get_file(t_statserv *);
+int	read_all_files(char *, int);
+
+
+#endif /* FTP_H_ */

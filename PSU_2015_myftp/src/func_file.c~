@@ -1,0 +1,141 @@
+/*
+** func_file.c for func_file in /home/meuric_a/Projet_T2_Test/FTP/include
+** 
+** Made by Alban Meurice
+** Login   <meuric_a@epitech.net>
+** 
+** Started on  Fri May 13 10:18:55 2016 Alban Meurice
+** Last update Sat May 14 16:03:58 2016 Alban Meurice
+*/
+
+#include "../inc/ftp.h"
+#include <dirent.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+#include <errno.h>
+
+int	size_file(char *path)
+{
+  int	fd;
+  char	c;
+  int	size;
+
+  errno = 0;
+  if ((fd = open(path, O_RDONLY)) == -1)
+    {
+      printf("%s\n", strerror(errno));
+      return (-1);
+    }
+  if (read(fd, &c, 1) == -1)
+    {
+      close(fd);
+      return (-1);
+    }
+  size = 1;
+  while (read(fd, &c, 1) > 0)
+    {
+      size = size + 1;
+    }
+  /*while (c != EOF)
+    {
+    if (read(fd, &c, 1) == -1)
+	{
+	  close(fd);
+	  return (-1);
+	}
+      size = size + 1;
+      }*/
+  close(fd);
+  return (size);
+}
+
+char	*read_file(int size, char *path)
+{
+  char	*buff;
+  int	fd;
+
+  if ((fd = open(path, O_RDONLY)) == -1)
+    return (NULL);
+  if ((buff = malloc(size * sizeof(char))) == NULL)
+    {
+      close(fd);
+      return (NULL);
+    }
+  if (read(fd, buff, size) == -1)
+    {
+      close(fd);
+      return (NULL);
+    }
+  close(fd);
+  return (buff);
+}
+
+char	*get_file(t_statserv *status)
+{
+  char	*buff;
+  char	*file;
+  int	i;
+
+  i = 0;
+  write(1, "Y4\n", 3);
+  if ((buff = malloc(4096 * sizeof(char))) == NULL)
+    return (NULL);
+  write(1, "Y5\n", 3);
+  //boucle inf read parceque nc n'écrit rien
+  if (read(status->data.fd_SocketData, buff, 4096) == -1)
+    return (NULL);
+  write(1, "Y6\n", 3);
+  while(buff[i] != '\0' && i <= 4096)
+    {
+      if ((file = realloc(file, (i + 1) * sizeof(char))) == NULL)
+	return (NULL);
+      file[i] = buff[i];
+      i = i + 1;
+    }
+  write(1, "Y7\n", 3);
+  file[i] = '\0';
+  return (file);
+}
+
+int	read_all_files(char *arg, int fd_SockClient)
+{
+  struct dirent		*dir;
+  DIR			*rep;
+  char			*current;
+
+  if (arg == NULL)
+    {
+      if ((rep = opendir(".")) == NULL)
+	return (-1);
+    }
+  else
+    if ((rep = opendir(arg)) == NULL)
+      return (-1);
+  current = NULL;
+  while ((dir = readdir(rep)) != NULL)
+    {
+      if (current == NULL)
+	{
+	  if ((current = strdup(dir->d_name)) == NULL)
+	    return (-1);
+	  if ((current = realloc(current, strlen(current) + 1)) == NULL)
+	    return (-1);
+	  strcat(current, "\n");
+	}
+      else
+	{
+	  if ((current = realloc(current, 1 + strlen(dir->d_name))) == NULL)
+	    return (-1);
+	  strcat(current, dir->d_name);
+	  strcat(current, "\n");
+	}
+    }
+  write(fd_SockClient, current, strlen(current));
+  return (0);
+}

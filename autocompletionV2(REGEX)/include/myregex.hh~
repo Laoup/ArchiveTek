@@ -1,0 +1,32 @@
+//
+// regex.hh for autocompletion in /home/meuric_a/Synthese_TEK2/autocompletionV2(REGEX)/include
+// 
+// Made by Alban Meurice
+// Login   <meuric_a@epitech.net>
+// 
+// Started on  Thu Jun 30 15:04:15 2016 Alban Meurice
+// Last update Thu Jun 30 15:23:31 2016 Alban Meurice
+//
+
+#ifndef REGEX_HH_
+# define REGEX_HH_
+
+#include <regex.h>
+
+class		MyRegex
+{
+  regex_t	pReg;
+  int		match;
+
+  size_t	nmatch;
+  regmatch_t	*pmatch;
+
+public:
+  MyRegex();
+  ~MyRegex();
+
+  int	initReg(char *);
+  int	searchReg(char *);
+};
+
+#endif /* REGEX_HH_ */

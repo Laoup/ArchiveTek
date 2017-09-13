@@ -1,0 +1,45 @@
+//
+// regex.cpp for autocompletion regex in /home/meuric_a/Synthese_TEK2/autocompletionV2(REGEX)/src
+// 
+// Made by Alban Meurice
+// Login   <meuric_a@epitech.net>
+// 
+// Started on  Thu Jun 30 15:11:21 2016 Alban Meurice
+// Last update Thu Jun 30 16:22:03 2016 Alban Meurice
+//
+
+#include "myregex.hh"
+#include <stdio.h>
+#include <string.h>
+
+MyRegex::MyRegex()
+{
+  this->match = -1;
+  this->nmatch = 0;
+  this->pmatch = NULL;
+}
+
+MyRegex::~MyRegex()
+{
+  /*  regfree(this->pReg);*/
+}
+
+int	MyRegex::initReg(char *reg)
+{
+  if (regcomp(&this->pReg, reg) != 0)
+    return (-1);
+  this->nmatch = this->preg.re_nsub;
+  if ((this->pmatch = malloc(sizeof(regmatch_t) * this->nmatch)) == NULL)
+    return (-1);
+  return (0);
+}
+
+int	MyRegex::searchReg(const char *str)
+{
+  char	*chr;
+
+  if ((chr = strdup(str)) == NULL)
+    return (-1);
+  this->match = regexec(&this->pReg, chr, this->nmatch, this->pmatch, 0);
+  return (this->match);
+}
